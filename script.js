@@ -1,15 +1,25 @@
-// Firebase Config
+// Import Firebase modular SDK
+import { initializeApp } from "firebase/app";
+import { getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCN8q1uF4Ox5drhgQLY3m-oCEt8suSlRfs",
-  authDomain: "ahjincc.firebaseapp.com",
-  projectId: "ahjincc",
-  storageBucket: "ahjincc.appspot.com",
-  messagingSenderId: "287401404736",
-  appId: "1:287401404736:web:88fbe3b9bf4c4c20ae32a5"
+  apiKey: "AIzaSyDlFYzg5Te2jz-kVKXd0yGYlJkMwU9fxss",
+  authDomain: "ju-civil-a-martian.firebaseapp.com",
+  projectId: "ju-civil-a-martian",
+  storageBucket: "ju-civil-a-martian.firebasestorage.app",
+  messagingSenderId: "247448010406",
+  appId: "1:247448010406:web:a2efa79a4080513cc87e67",
+  measurementId: "G-BXYMLKE395"
 };
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Theme toggle
 const themeToggle = document.getElementById('theme-toggle');
@@ -47,7 +57,7 @@ document.querySelectorAll('.toggle-password').forEach(btn => {
   });
 });
 
-// Password validation on register
+// Password Length Validator
 const registerPassword = document.getElementById('registerPassword');
 registerPassword.addEventListener('input', function() {
   const errorMessage = document.getElementById('password-error');
@@ -99,12 +109,12 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
   }
   showLoading();
   try {
-    // Use roll as email: roll@juce.in
     const email = `${roll}@juce.in`;
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    await setPersistence(auth, browserLocalPersistence); // Always persistent for now
+    await signInWithEmailAndPassword(auth, email, password);
     // Fetch role from Firestore
-    const userDoc = await db.collection('users').doc(roll).get();
-    const role = userDoc.exists && userDoc.data().role ? userDoc.data().role : 'student';
+    const userDoc = await getDoc(doc(db, "users", roll));
+    const role = userDoc.exists() && userDoc.data().role ? userDoc.data().role : 'student';
     hideLoading();
     if (role === 'admin') {
       showSuccessModal('Welcome, Admin!', '/admin.html');
@@ -120,28 +130,28 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
 // Register
 document.getElementById('registerForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const name = document.getElementById('registerName').value.trim();
   const roll = document.getElementById('registerRoll').value.trim();
+  const subsection = document.getElementById('registerSubsection').value;
   const password = document.getElementById('registerPassword').value;
   const confirmPassword = document.getElementById('confirmPassword').value;
-  if (!/^\d{12}$/.test(roll)) {
-    showErrorMessage('Roll number must be 12 digits.');
-    return;
-  }
-  if (password.length < 6 || password.length > 16) {
-    showErrorMessage('Password must be 6-16 characters.');
-    return;
-  }
-  if (password !== confirmPassword) {
-    showErrorMessage('Passwords do not match.');
-    return;
-  }
+  if (!/^\d{12}$/.test(roll)) { showErrorMessage('Roll number must be 12 digits.'); return; }
+  if (!name) { showErrorMessage('Name is required.'); return; }
+  if (!subsection) { showErrorMessage('Please select subsection.'); return; }
+  if (password.length < 6 || password.length > 16) { showErrorMessage('Password must be 6-16 characters.'); return; }
+  if (password !== confirmPassword) { showErrorMessage('Passwords do not match.'); return; }
   showLoading();
   try {
-    // Use roll as email: roll@juce.in
     const email = `${roll}@juce.in`;
-    await auth.createUserWithEmailAndPassword(email, password);
-    // Save user role (student) in Firestore
-    await db.collection('users').doc(roll).set({ role: 'student' });
+    await setPersistence(auth, browserLocalPersistence);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(userCredential.user, { displayName: name });
+    // Save user info and role (student) in Firestore
+    await setDoc(doc(db, "users", roll), {
+      name,
+      subsection,
+      role: 'student'
+    });
     hideLoading();
     showSuccessModal('Registration successful!', '/landing/landing.html');
   } catch (err) {
