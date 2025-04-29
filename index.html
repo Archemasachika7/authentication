@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Login | JU Civil A Martian Portal</title>
+  <link rel="stylesheet" href="auth.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="particles"></div>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo"><h1>🪐 JU Civil A</h1></div>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="sun-icon">☀️</span>
+          <span class="moon-icon">🌑</span>
+        </button>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="register">Register</button>
+      </div>
+      <div class="auth-content">
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active" autocomplete="off">
+          <h2>Student Login</h2>
+          <div class="form-group">
+            <label for="loginRoll">Roll Number</label>
+            <div class="input-with-icon">
+              <span class="material-icons">badge</span>
+              <input type="text" id="loginRoll" pattern="^\d{12}$" maxlength="12" required placeholder="e.g. 002410401001" autocomplete="username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="input-with-icon">
+              <span class="material-icons">lock</span>
+              <input type="password" id="loginPassword" required autocomplete="current-password">
+              <button type="button" class="toggle-password" tabindex="-1"><span class="material-icons">visibility_off</span></button>
+            </div>
+          </div>
+          <button class="primary-btn" type="submit">Login</button>
+        </form>
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form" autocomplete="off">
+          <h2>Register</h2>
+          <div class="form-group">
+            <label for="registerRoll">Roll Number</label>
+            <div class="input-with-icon">
+              <span class="material-icons">badge</span>
+              <input type="text" id="registerRoll" pattern="^\d{12}$" maxlength="12" required placeholder="e.g. 002410401001" autocomplete="username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <div class="input-with-icon">
+              <span class="material-icons">lock</span>
+              <input type="password" id="registerPassword" required autocomplete="new-password">
+              <button type="button" class="toggle-password" tabindex="-1"><span class="material-icons">visibility_off</span></button>
+            </div>
+            <div id="password-error" style="color:#ff3b30;display:none;font-size:0.9em;">Password must be 6-16 characters.</div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="input-with-icon">
+              <span class="material-icons">lock</span>
+              <input type="password" id="confirmPassword" required autocomplete="new-password">
+              <button type="button" class="toggle-password" tabindex="-1"><span class="material-icons">visibility_off</span></button>
+            </div>
+          </div>
+          <button class="primary-btn" type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Animated feedback overlays -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loader"></div>
+  </div>
+  <div class="modal" id="successModal">
+    <div class="modal-content success-modal">
+      <div class="success-icon"><span>✅</span></div>
+      <h2>Success</h2>
+      <p id="successMessage"></p>
+      <button class="primary-btn" id="successDoneBtn">Continue</button>
+    </div>
+  </div>
+  <div class="backdrop" id="backdrop"></div>
+  <div class="alert error-alert" id="error-alert">
+    <div class="alert-icon-container"><span class="alert-icon"></span></div>
+    <div class="alert-content">
+      <div class="alert-title">Authentication Failed</div>
+      <div class="alert-message"></div>
+    </div>
+  </div>
+  <!-- Material Icons for password toggle -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Firebase JS SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
